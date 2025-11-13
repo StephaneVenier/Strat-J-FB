@@ -1,5 +1,4 @@
-
-const firebaseConfig = {
+window.STRATJ_FIREBASE_CONFIG = {
   apiKey: "AIzaSyBNgwNOuNOr9HQe7Z59IL_Zboc6CE2hJDs",
   authDomain: "strat-j.firebaseapp.com",
   projectId: "strat-j",
