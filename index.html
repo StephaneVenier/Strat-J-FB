@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Strat &amp; J — Accueil</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --radius:16px; --mono:'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+      --sans:'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      --shadow:0 8px 24px rgba(15,23,42,.10);
+      --bg:#E8ECF2; --panel:#F4F6FA; --ink:#0E172A; --muted:#475569; --line:#CBD5E1;
+      --primary:#2F6FED; --success:#2BB673; --accent:#FD8E3E; --danger:#EF4444;
+    }
+    *{box-sizing:border-box} html,body{height:100%} body{margin:0;font-family:var(--sans);background:var(--bg);color:var(--ink);}
+    .shell{max-width:960px;margin:0 auto;padding:32px 20px;display:flex;flex-direction:column;gap:24px}
+    header{display:flex;justify-content:space-between;gap:16px;align-items:center}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:44px;height:44px;border-radius:10px;background:conic-gradient(from 210deg, var(--primary), var(--success), var(--primary));box-shadow:inset 0 0 0 2px rgba(255,255,255,.4),0 6px 18px rgba(0,0,0,.15); position:relative}
+    .logo:before,.logo:after{content:"");position:absolute;inset:8px;border-radius:8px;border:1px dashed rgba(255,255,255,.5)}
+    .title{font-weight:800;font-size:20px}
+    .sub{color:var(--muted);font-size:14px}
+    .pill{padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.7);font-size:12px;display:inline-flex;gap:6px;align-items:center}
+    main{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:24px;align-items:flex-start}
+    @media(max-width:840px){main{grid-template-columns:1fr} header{flex-direction:column;align-items:flex-start}}
+    .card{background:var(--panel);border-radius:var(--radius);border:1px solid var(--line);box-shadow:var(--shadow);padding:20px}
+    h1{font-size:26px;margin:0 0 10px 0}
+    h2{font-size:18px;margin:0 0 6px 0}
+    p{margin:0 0 8px 0;color:var(--muted);font-size:14px}
+    ul{margin:6px 0 0 18px;padding:0;color:var(--muted);font-size:14px}
+    .badge-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+    .badge{font-size:11px;padding:6px 8px;border-radius:999px;border:1px dashed var(--line);background:white}
+    label{display:block;font-size:13px;margin-bottom:4px;color:var(--muted)}
+    input{width:100%;height:40px;padding:0 10px;border-radius:10px;border:1px solid var(--line);font-family:var(--sans);font-size:14px}
+    input:focus{outline:2px solid var(--primary);border-color:transparent}
+    .row{display:flex;gap:10px;align-items:center}
+    .btn{height:40px;padding:0 14px;border-radius:10px;border:none;font-weight:600;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+    .btn.primary{background:var(--primary);color:white;box-shadow:0 6px 18px rgba(37,99,235,.45)}
+    .btn.ghost{background:white;border:1px solid var(--line);color:var(--ink)}
+    .small{font-size:12px;color:var(--muted)}
+    .error{color:var(--danger);font-size:12px;margin-top:6px;min-height:16px}
+    .success{color:var(--success);font-size:12px;margin-top:6px;min-height:16px}
+    .hint{font-family:var(--mono);font-size:12px;background:rgba(15,23,42,.85);color:white;padding:6px 8px;border-radius:8px;display:inline-flex;align-items:center;gap:6px}
+    .hint span.key{padding:2px 5px;border-radius:4px;background:rgba(148,163,184,.65);font-size:11px}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <div class="title">Strat &amp; J — Arena</div>
+          <div class="sub">Plateforme sport / fatigue avec progression de compte &amp; personnages</div>
+        </div>
+      </div>
+      <div class="pill">
+        <span>Prototype connecté Firebase (email + mot de passe)</span>
+      </div>
+    </header>
+
+    <main>
+      <section class="card">
+        <h1>Bienvenue dans l’arène</h1>
+        <p><b>Objectif :</b> transformer tes entraînements en jeu vidéo. Chaque personnage possède sa fatigue, son équipement et son XP. Ton <b>compte</b>, lui, progresse via tous tes personnages.</p>
+        <p>Ce prototype gère déjà :</p>
+        <ul>
+          <li>fatigue par personnage (récupération + reset à 1h),</li>
+          <li>XP personnage et XP compte (avec gains d’euros virtuels),</li>
+          <li>inventaire et équipement (chaussures, hauts, bas, montre),</li>
+          <li>récompense quotidienne et timer jusqu’au prochain reset,</li>
+          <li>plusieurs sports (course, Hyrox, Crossfit, vélo, rugby).</li>
+        </ul>
+
+        <div class="badge-row">
+          <div class="badge">Fatigue &amp; reset à 1h</div>
+          <div class="badge">XP compte + XP personnages</div>
+          <div class="badge">Objets &amp; inventaire</div>
+          <div class="badge">Gains d’euros virtuels</div>
+          <div class="badge">Prêt pour Firebase / Vercel</div>
+        </div>
+
+        <p style="margin-top:14px;font-size:13px;color:var(--muted);">
+          Après connexion, tu seras redirigé vers la <b>page de jeu</b> (<code>game.html</code>) qui contient tout le système actuel (fatigue, entraînements, équipements, etc.).
+        </p>
+      </section>
+
+      <section class="card">
+        <h2>Connexion / Création de compte</h2>
+        <p>Ton identifiant est basé sur un <b>pseudo</b> + un tag numérique aléatoire : <code>pseudo#1234</code>.</p>
+
+        <div style="margin-top:10px;display:grid;gap:10px;">
+          <div>
+            <label for="pseudoInput">Pseudo</label>
+            <input id="pseudoInput" type="text" placeholder="Ton pseudo (ex : stef)" autocomplete="off" />
+          </div>
+          <div class="row" style="justify-content:space-between;">
+            <div class="small">Identifiant généré :</div>
+            <div class="hint"><span id="pseudoPreview">—</span><span class="key">auto</span></div>
+          </div>
+          <div>
+            <label for="emailInput">Email</label>
+            <input id="emailInput" type="email" placeholder="adresse@mail.com" autocomplete="email" />
+          </div>
+          <div>
+            <label for="passwordInput">Mot de passe</label>
+            <input id="passwordInput" type="password" placeholder="Minimum 6 caractères" autocomplete="current-password" />
+          </div>
+
+          <div class="row" style="margin-top:10px;">
+            <button class="btn primary" id="signupBtn">Créer un compte</button>
+            <button class="btn ghost" id="loginBtn">Se connecter</button>
+          </div>
+          <div class="small">
+            La création / connexion utilise Firebase Auth (email + mot de passe). Remplis le fichier <code>firebase-config.js</code> avec ta configuration.
+          </div>
+          <div id="authMsg" class="error"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="./firebase-config.js"></script>
+
+  <script>
+    const pseudoInput = document.getElementById('pseudoInput');
+    const pseudoPreview = document.getElementById('pseudoPreview');
+    const emailInput = document.getElementById('emailInput');
+    const passwordInput = document.getElementById('passwordInput');
+    const msgEl = document.getElementById('authMsg');
+
+    function generateTag() {
+      return String(Math.floor(1000 + Math.random()*9000));
+    }
+    function buildPseudoTag() {
+      const base = (pseudoInput.value || '').trim();
+      if (!base) {
+        pseudoPreview.textContent = '—';
+        return null;
+      }
+      const existing = sessionStorage.getItem('stratj_tag_for_' + base.toLowerCase());
+      const tag = existing || generateTag();
+      if (!existing) {
+        sessionStorage.setItem('stratj_tag_for_' + base.toLowerCase(), tag);
+      }
+      const full = base + '#' + tag;
+      pseudoPreview.textContent = full;
+      return full;
+    }
+
+    pseudoInput.addEventListener('input', () => {
+      buildPseudoTag();
+      msgEl.textContent = '';
+    });
+
+    function setMessage(type, text) {
+      msgEl.textContent = text;
+      msgEl.className = type === 'error' ? 'error' : 'success';
+    }
+
+    async function signup() {
+      setMessage('error', '');
+      const nameTag = buildPseudoTag();
+      const email = emailInput.value.trim();
+      const pass = passwordInput.value;
+      if (!nameTag) return setMessage('error', 'Merci de choisir un pseudo.');
+      if (!email) return setMessage('error', 'Merci de saisir un email.');
+      if (!pass || pass.length < 6) return setMessage('error', 'Mot de passe trop court (minimum 6 caractères).');
+      try {
+        const app = firebase.apps[0] || firebase.initializeApp(window.STRATJ_FIREBASE_CONFIG || {});
+        const auth = firebase.auth();
+        const cred = await auth.createUserWithEmailAndPassword(email, pass);
+        await cred.user.updateProfile({ displayName: nameTag });
+        localStorage.setItem('stratj_currentUserTag', nameTag);
+        window.location.href = 'game.html';
+      } catch (e) {
+        console.error(e);
+        setMessage('error', e.message || 'Erreur lors de la création du compte.');
+      }
+    }
+
+    async function login() {
+      setMessage('error', '');
+      const nameTag = buildPseudoTag();
+      const email = emailInput.value.trim();
+      const pass = passwordInput.value;
+      if (!email || !pass) return setMessage('error', 'Email et mot de passe requis.');
+      try {
+        const app = firebase.apps[0] || firebase.initializeApp(window.STRATJ_FIREBASE_CONFIG || {});
+        const auth = firebase.auth();
+        const cred = await auth.signInWithEmailAndPassword(email, pass);
+        const displayName = cred.user.displayName || nameTag || email;
+        localStorage.setItem('stratj_currentUserTag', displayName);
+        window.location.href = 'game.html';
+      } catch (e) {
+        console.error(e);
+        setMessage('error', e.message || 'Erreur lors de la connexion.');
+      }
+    }
+
+    document.getElementById('signupBtn').addEventListener('click', signup);
+    document.getElementById('loginBtn').addEventListener('click', login);
+
+    (function checkAuthOnLoad(){
+      try{
+        const app = firebase.apps[0] || firebase.initializeApp(window.STRATJ_FIREBASE_CONFIG || {});
+        firebase.auth().onAuthStateChanged(user => {
+          if (user) {
+            const tag = user.displayName || localStorage.getItem('stratj_currentUserTag') || user.email;
+            localStorage.setItem('stratj_currentUserTag', tag);
+            window.location.href = 'game.html';
+          }
+        });
+      }catch(e){
+        console.warn('Firebase non configuré encore (firebase-config.js).');
+      }
+    })();
+  </script>
+</body>
+</html>

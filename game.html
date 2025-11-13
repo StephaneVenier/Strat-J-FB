@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Strat & J — Jeu</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --radius:16px; --mono:'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+      --sans:'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      --shadow:0 8px 24px rgba(15,23,42,.10);
+      --z-toast:9999; --z-modal:9998;
+    }
+    [data-theme="A"]{ --bg:#E8ECF2; --panel:#F4F6FA; --ink:#0E172A; --muted:#475569; --line:#CBD5E1; --primary:#2F6FED; --success:#2BB673; --accent:#FD8E3E; --danger:#EF4444; --chip:#FFFFFF; --chip-line:#E5EAF1; }
+    [data-theme="B"]{ --bg:#1F2933; --panel:#27323F; --ink:#F8FAFC; --muted:#CBD5E1; --line:#374151; --primary:#3B82F6; --success:#22C55E; --accent:#F59E0B; --danger:#F87171; --chip:#2B3644; --chip-line:#3B4757; }
+    [data-theme="C"]{ --bg:#DDE8E5; --panel:#F0F4F2; --ink:#14213D; --muted:#465169; --line:#C9D6CF; --primary:#0077B6; --success:#00B894; --accent:#FF9F1C; --danger:#D90429; --chip:#FFFFFF; --chip-line:#D9E6E1; }
+
+    *{box-sizing:border-box} html,body{height:100%} body{margin:0;font-family:var(--sans);color:var(--ink);background:var(--bg)}
+    .shell{max-width:1240px;margin:0 auto;padding:28px}
+    header{display:flex;gap:16px;align-items:center;justify-content:space-between;margin-bottom:18px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:44px;height:44px;border-radius:10px;background:conic-gradient(from 210deg, var(--primary), var(--success), var(--primary));box-shadow:inset 0 0 0 2px rgba(255,255,255,.4),0 6px 18px rgba(0,0,0,.15); position:relative}
+    .logo:before,.logo:after{content:"";position:absolute;inset:8px;border-radius:8px;border:1px dashed rgba(255,255,255,.5)}
+    .title{font-weight:800;letter-spacing:.2px} .sub{color:var(--muted);font-size:14px}
+    nav{display:flex;gap:8px;align-items:center}
+    .tab{padding:10px 14px;border-radius:12px;background:var(--chip);border:1px solid var(--chip-line);cursor:pointer;font-weight:600}
+    .tab.active{outline:2px solid var(--primary)}
+    .stack{display:grid;grid-template-columns:280px 1fr;gap:20px}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+    .card h3{margin:0 0 8px 0;font-size:16px}
+    .card .hd{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line)}
+    .card .bd{padding:16px}
+    .badge{display:inline-flex;align-items:center;gap:8px;font:600 12px/1 var(--sans);padding:8px 10px;border-radius:999px;border:1px solid var(--line);background:var(--chip)}
+    .badge .dot{width:8px;height:8px;border-radius:999px;background:var(--success)}
+    .meter{height:10px;background:rgba(255,255,255,.4);border-radius:999px;border:1px solid var(--line);overflow:hidden}
+    .meter>i{display:block;height:100%;background:linear-gradient(90deg,var(--primary),var(--success));}
+    .list{display:grid;gap:10px}
+    .chip{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--chip-line);border-radius:12px;background:var(--chip);cursor:pointer;transition:.15s;color:var(--ink)}
+    .chip:hover{transform:translateY(-1px);box-shadow:var(--shadow)} .chip.active{outline:2px solid var(--primary)}
+    .avatar{width:36px;height:36px;border-radius:10px;overflow:hidden;display:grid;place-items:center;background:linear-gradient(180deg,#C7D2FE,#93C5FD);font-weight:700;color:#1E293B}
+    .avatar img{width:100%;height:100%;object-fit:cover;display:block}
+    .grid{display:grid;gap:14px} .grid.cols-3{grid-template-columns:repeat(3,1fr)}
+    .row{display:flex;align-items:center;gap:10px} .row.space{justify-content:space-between}
+    .sel, .btn{height:40px;border-radius:12px;border:1px solid var(--line);background:var(--chip);padding:0 12px;font-weight:600;color:var(--ink)}
+    .btn{display:inline-flex;align-items:center;gap:8px;cursor:pointer}
+    .btn.primary{background:var(--primary);border-color:transparent;color:#fff;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+    .btn:disabled{opacity:.5;cursor:not-allowed}
+    .tag{font:600 11px/1 var(--mono);padding:6px 8px;border-radius:8px;background:rgba(255,255,255,.35);color:var(--ink);border:1px dashed var(--line)}
+    .mono{font-family:var(--mono)}
+    .pill{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border:1px dashed var(--line);border-radius:999px;background:var(--chip)}
+    .small{font-size:12px;color:var(--muted)}
+    .equip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    .equip .slot{border:1px dashed var(--line);border-radius:12px;min-height:72px;display:grid;place-items:center;position:relative;background:rgba(255,255,255,.25)}
+    .equip .slot.active{border-style:solid;border-color:#BFD8FF;background:rgba(255,255,255,.45)}
+    .equip .slot .label{position:absolute;top:6px;left:8px;font:600 10px var(--mono);color:var(--ink);background:rgba(255,255,255,.35);border:1px solid var(--line);border-radius:6px;padding:2px 6px}
+    .train{display:grid;gap:12px} .train .it{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--chip);display:grid;gap:10px}
+    .train .it .k{display:flex;flex-wrap:wrap;gap:8px}
+    .journal{display:grid;gap:10px} .log{border-left:3px solid var(--primary);background:var(--chip);border:1px solid var(--line);border-left-color:var(--primary);border-radius:12px;padding:10px 12px}
+    @media (max-width: 980px){.stack{grid-template-columns:1fr}}
+    .toast{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:var(--z-toast)}
+    .toast.show{display:flex}
+    .toast .box{min-width:260px;max-width:360px;background:var(--chip);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:16px 18px;transform:translateY(10px);opacity:0;animation:pop .9s ease forwards}
+    @keyframes pop{to{transform:translateY(0);opacity:1}}
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:var(--z-modal)}
+    .modal.show{display:flex}
+    .modal .panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);width:520px;max-width:calc(100% - 32px);padding:16px}
+    .modal h4{margin:0 0 8px 0}
+  </style>
+</head>
+<body data-theme="A">
+  <div class="shell">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <div class="title">Strat & J</div>
+          <div class="sub">Plateforme d’entraînement & gestion de fatigue — Session de jeu</div>
+        </div>
+      </div>
+      <nav>
+        <div class="row" style="gap:8px;margin-right:auto">
+          <div class="pill"><span class="small">Connecté :</span> <span class="mono" id="userTag">invité</span></div>
+          <button class="btn" id="logoutBtn" type="button">Déconnexion</button>
+        </div>
+
+        <button class="tab active" data-page="dashboard">Tableau de bord</button>
+        <button class="tab" data-page="train">Entraînements</button>
+        <button class="tab" data-page="inventory">Inventaire</button>
+        <button class="tab" data-page="leaderboard">Classements</button>
+        <button class="tab" data-page="competitions">Compétitions</button>
+        <div class="row" style="gap:8px;margin-left:12px">
+          <select id="themeSel" class="sel" title="Thème">
+            <option value="A">Thème A — Bleu acier</option>
+            <option value="B">Thème B — Graphite</option>
+            <option value="C">Thème C — Menthe</option>
+          </select>
+          <div class="badge"><span>€</span> <span class="mono" id="coins">0.00</span></div>
+          <button class="btn" id="dailyBtn">Récompense du jour</button>
+          <div class="badge" id="fatigueBadge"><span class="dot" id="fatigueDot"></span><span>Fatigue</span> <span class="mono" id="fatigueNow">20</span>/<span class="mono" id="fatigueMax">20</span></div>
+          <div class="pill"><span class="small">Prochain reset (1h)</span> <span class="mono" id="resetTimer">--:--:--</span></div>
+        </div>
+      </nav>
+    </header>
+
+    <div class="stack">
+      <aside class="card">
+        <div class="hd"><h3>Personnages</h3><span class="small">Sélection</span></div>
+        <div class="bd">
+          <div id="charList" class="list"></div>
+        </div>
+      </aside>
+
+      <main class="grid" style="gap:20px">
+        <section class="page" id="page-dashboard">
+          <section class="card">
+            <div class="hd"><h3>État & Config</h3><span class="tag">DEMO</span></div>
+            <div class="bd grid cols-3">
+              <div>
+                <div class="small">Niveau de compte</div>
+                <div class="row space" style="margin:6px 0 8px 0">
+                  <div class="mono" id="acctLevel">1</div>
+                  <div class="small">XP compte: <span class="mono" id="acctXp">0</span> / <span class="mono" id="acctXpNext">100</span></div>
+                </div>
+                <div class="meter"><i id="acctXpBar" style="width:0%"></i></div>
+              </div>
+              <div>
+                <div class="small">Sport actif</div>
+                <div class="row" style="margin-top:6px">
+                  <select id="sportSel" class="sel">
+                    <option value="course">Course / Trail</option>
+                    <option value="hyrox">Hyrox</option>
+                    <option value="crossfit">Crossfit</option>
+                    <option value="velo">Vélo</option>
+                    <option value="rugby">Rugby (solo)</option>
+                  </select>
+                  <button class="btn" id="switchSport">Appliquer</button>
+                </div>
+                <div class="small" style="margin-top:8px">Un feedback visuel confirme l’application du sport.</div>
+              </div>
+              <div>
+                <div class="small">Équipement (perso actif)</div>
+                <div class="equip">
+                  <div class="slot" data-slot="shoes"><span class="label">Chaussures</span><span class="small" id="slot_shoes">aucun</span></div>
+                  <div class="slot" data-slot="top"><span class="label">Haut</span><span class="small" id="slot_top">aucun</span></div>
+                  <div class="slot" data-slot="bottom"><span class="label">Bas</span><span class="small" id="slot_bottom">aucun</span></div>
+                  <div class="slot" data-slot="watch"><span class="label">Montre</span><span class="small" id="slot_watch">aucun</span></div>
+                </div>
+                <div class="small" style="margin-top:6px">Passe par l’onglet <b>Inventaire</b> pour attribuer des objets à un personnage.</div>
+              </div>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="hd"><h3>Journal & Caractéristiques</h3><span class="small">Perso actif</span></div>
+            <div class="bd">
+              <div class="grid cols-3">
+                <div>
+                  <div class="small">Niveau personnage</div>
+                  <div class="row space"><div class="mono" id="charLevel">1</div><div class="small">XP: <span class="mono" id="xpNow">0</span>/<span class="mono" id="xpNext">50</span></div></div>
+                  <div class="meter" style="margin-top:6px"><i id="xpBar" style="width:0%"></i></div>
+                </div>
+                <div>
+                  <div class="small">Caractéristiques</div>
+                  <div class="grid">
+                    <div class="row space"><span>Endurance</span><span class="mono" id="statEndu">5.0</span></div>
+                    <div class="row space"><span>Force</span><span class="mono" id="statForce">5.0</span></div>
+                    <div class="row space"><span>Vitesse</span><span class="mono" id="statVit">5.0</span></div>
+                    <div class="row space"><span>Technique</span><span class="mono" id="statTech">5.0</span></div>
+                  </div>
+                </div>
+                <div>
+                  <div class="small">Règles clés</div>
+                  <ul class="small" style="margin:6px 0 0 16px">
+                    <li>Reset global à <b>1h</b> (heure locale) → fatigue au max.</li>
+                    <li>Récupération <b>+1 fatigue / heure</b> jusqu’à la limite.</li>
+                    <li>Fatigue et XP sont <b>propres au personnage</b>.</li>
+                  </ul>
+                </div>
+              </div>
+              <hr style="border:none;border-top:1px solid var(--line);margin:16px 0"/>
+              <div class="journal" id="journal"></div>
+            </div>
+          </section>
+        </section>
+
+        <section class="page" id="page-train" style="display:none">
+          <section class="card">
+            <div class="hd"><h3>Entraînements disponibles</h3><span class="small" id="sportHint">Course / Trail</span></div>
+            <div class="bd train" id="trainList"></div>
+          </section>
+        </section>
+
+        <section class="page" id="page-inventory" style="display:none">
+          <section class="card">
+            <div class="hd"><h3>Inventaire</h3><span class="small">Attribuer aux personnages</span></div>
+            <div class="bd">
+              <p class="small">Niveau 1 : <b>pack débutant</b> (objets communs). Clique un objet pour l’assigner à un personnage compatible.</p>
+              <div class="grid cols-3" id="invGrid"></div>
+            </div>
+          </section>
+        </section>
+
+        <section class="page" id="page-leaderboard" style="display:none">
+          <section class="card">
+            <div class="hd"><h3>Classements</h3><span class="small">Saisons à venir</span></div>
+            <div class="bd">
+              <p class="small">Des classements par sport et un classement général de compte seront ajoutés (XP compte, ligues saisonnières, divisions, etc.).</p>
+            </div>
+          </section>
+        </section>
+
+        <section class="page" id="page-competitions" style="display:none">
+          <section class="card">
+            <div class="hd"><h3>Compétitions</h3><span class="small">PvE / PvP (futur)</span></div>
+            <div class="bd">
+              <p class="small">Épreuves départementales dès niveau de compte 5, puis villes/événements réels. Des défis saisonniers exclusifs inciteront à jouer dans le temps imparti.</p>
+            </div>
+          </section>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"><div class="box" id="toastBox">Sport appliqué</div></div>
+
+  <div class="modal" id="assignModal">
+    <div class="panel">
+      <h4>Attribuer l’objet</h4>
+      <div class="small" id="assignItemInfo">—</div>
+      <div class="row" style="margin:10px 0">
+        <label class="small" for="assignCharSel">Personnage :</label>
+        <select id="assignCharSel" class="sel"></select>
+        <button class="btn primary" id="assignConfirm">Assigner</button>
+        <button class="btn" id="assignCancel">Annuler</button>
+      </div>
+      <div class="small">(Un objet équipé devient indisponible pour les autres persos jusqu’au retrait.)</div>
+    </div>
+  </div>
+
+  <script>
+  const STORAGE_KEY = 'stratj_v1';
+  function saveState(){ const toSave = {account, state, baseCharacters, inventory}; localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave)); }
+  function loadState(){ try{ const raw = localStorage.getItem(STORAGE_KEY); if(!raw) return false; const data = JSON.parse(raw);
+    if(data.account) Object.assign(account, data.account);
+    if(data.state){ state.theme = data.state.theme || 'A'; state.sport = data.state.sport || 'course'; state.activeChar = data.state.activeChar || 'alex'; state.chars = data.state.chars || {}; }
+    if(Array.isArray(data.inventory)){ inventory.length = 0; data.inventory.forEach(it=>inventory.push(it)); }
+    return true;}catch(e){ console.warn('Load state failed', e); return false; }}
+
+  const baseCharacters = [
+    {id:'alex', name:'Alex',  img:'./assets/characters/alex.svg',  stats:{endu:5.0, force:5.0, vit:5.0, tech:5.0}},
+    {id:'maya', name:'Maya',  img:'./assets/characters/maya.svg',  stats:{endu:5.5, force:4.8, vit:5.1, tech:5.0}},
+    {id:'noah', name:'Noah',  img:'./assets/characters/noah.svg',  stats:{endu:4.9, force:5.4, vit:5.0, tech:4.8}},
+    {id:'ines', name:'Inès',  img:'./assets/characters/ines.svg',  stats:{endu:5.2, force:5.0, vit:4.9, tech:5.1}},
+    {id:'liam', name:'Liam',  img:'./assets/characters/liam.svg',  stats:{endu:4.8, force:5.2, vit:5.3, tech:4.9}},
+    {id:'elise', name:'Élise', img:'./assets/characters/elise.svg', stats:{endu:5.1, force:4.9, vit:5.0, tech:5.2}},
+  ];
+
+  const catalogs = {
+    course: [
+      {id:'ef30',  name:'Endurance fondamentale 30′', cost:6, xp:10, gains:{endu:0.6, vit:0.1}},
+      {id:'interv',name:'Intervalles 6×2′',         cost:8, xp:14, gains:{vit:0.7, endu:0.2}},
+      {id:'tech',  name:'Technique de foulée 15′',  cost:4, xp:8,  gains:{tech:0.5, vit:0.2}},
+      {id:'renfo', name:'Renfo bas du corps 20′',   cost:7, xp:12, gains:{force:0.6, tech:0.1}},
+    ],
+    hyrox: [
+      {id:'sled',  name:'Sled push/pull',     cost:9, xp:16, gains:{force:0.7, endu:0.3}},
+      {id:'burpees',name:'Burpees cadence',   cost:6, xp:10, gains:{endu:0.5, tech:0.2}},
+      {id:'run1k', name:'Course 1 km tempo',  cost:7, xp:12, gains:{vit:0.6, endu:0.3}},
+    ],
+    crossfit: [
+      {id:'emom',  name:'EMOM 12′ technique', cost:5, xp:9,  gains:{tech:0.6, force:0.2}},
+      {id:'metcon',name:'Metcon 15′ (AMRAP)', cost:9, xp:16, gains:{endu:0.6, force:0.4}},
+    ],
+    velo: [
+      {id:'z2',    name:'Sortie 45′ Z2',      cost:8, xp:14, gains:{endu:0.7, vit:0.2}},
+      {id:'cotes', name:'Côtes 6×2′',         cost:8, xp:14, gains:{vit:0.6, force:0.3}},
+    ],
+    rugby: [
+      {id:'accel', name:'Accélérations 10×30 m', cost:6, xp:10, gains:{vit:0.6, tech:0.2}},
+      {id:'plaqu', name:'Plaquages sur bouclier', cost:7, xp:12, gains:{force:0.6, tech:0.2}},
+      {id:'passes',name:'Passes ciblées',         cost:4, xp:8,  gains:{tech:0.6, endu:0.1}},
+    ],
+  };
+
+  const inventory = [
+    {id:'it_shoes_basic',  name:'Chaussures débutant', slot:'shoes',  rarity:'Commun', reduce:{course:0.05}},
+    {id:'it_top_breath',   name:'T‑shirt respirant',   slot:'top',    rarity:'Commun', reduce:{all:0.03}},
+    {id:'it_short_light',  name:'Short léger',         slot:'bottom', rarity:'Commun', reduce:{course:0.02, hyrox:0.02}},
+    {id:'it_watch_cardio', name:'Montre cardio',       slot:'watch',  rarity:'Commun', reduce:{all:0.03}},
+  ];
+
+  const account = { level:1, xp:0, xpNext:100, coins:0.00, lastDailyRewardAt:0 };
+  const state = { theme:'A', sport:'course', activeChar:'alex', chars:{} };
+
+  function newCharState(base){
+    return { level:1, xp:0, xpNext: calcXpNext(1), fatigueMax: calcFatigueMax(1), fatigueNow:20,
+      lastRegenAt: Date.now(), lastDailyResetAt: getTodayResetTimestamp(), stats: JSON.parse(JSON.stringify(base.stats)),
+      equip: {shoes:null, top:null, bottom:null, watch:null} };
+  }
+
+  function clamp(n,min,max){return Math.max(min, Math.min(max,n))}
+  function pct(part,total){return total>0? Math.round((part/total)*100):0}
+  function calcXpNext(level){return Math.round(50*Math.pow(level,1.35))}
+  function calcFatigueMax(level){return Math.round(20*Math.pow(1+0.06*level,0.9))}
+  function fmt(n, d=1){return Number(n.toFixed(d))}
+  function getTodayResetTimestamp(){ const now=new Date(); return new Date(now.getFullYear(), now.getMonth(), now.getDate(), 1, 0, 0, 0).getTime(); }
+  function getPrevResetTimestamp(){ const now=new Date(); const t=new Date(now.getFullYear(), now.getMonth(), now.getDate(), 1, 0, 0, 0); if(now.getTime()<t.getTime()){ t.setDate(t.getDate()-1);} return t.getTime();}
+  function getNextResetTimestamp(){ const now=new Date(); let t=new Date(now.getFullYear(), now.getMonth(), now.getDate(), 1, 0, 0, 0); if(now.getTime()>=t.getTime()){ t.setDate(t.getDate()+1);} return t.getTime();}
+
+  function tickPerCharRegen(charId){
+    const cs = state.chars[charId]; if(!cs) return; const now = Date.now();
+    const today1h = getTodayResetTimestamp();
+    if(cs.lastDailyResetAt < today1h && now >= today1h){ cs.fatigueNow = cs.fatigueMax; cs.lastDailyResetAt = today1h; addLog(`🔄 Reset quotidien 1h — fatigue ${cs.fatigueNow}/${cs.fatigueMax} pour ${getCharById(charId).name}.`); }
+    const hours = Math.floor((now - cs.lastRegenAt) / 3600000);
+    if(hours > 0){ cs.fatigueNow = clamp(cs.fatigueNow + hours, 0, cs.fatigueMax); cs.lastRegenAt += hours * 3600000; }
+  }
+
+  function canClaimDailyReward(){ const windowStart = getPrevResetTimestamp(); return account.lastDailyRewardAt < windowStart; }
+  function claimDailyReward(){
+    if(!canClaimDailyReward()) return;
+    let reward = 2 + (account.level * 0.5);
+    const r = Math.random();
+    if(r < 0.02){ reward += 2; addLog('🎁 Bonus quotidien rare : +2 €'); }
+    else if(r < 0.12){ reward += 1; addLog('🎁 Bonus quotidien : +1 €'); }
+    if(Math.random() < 0.10){ addItemToInventory({id:'it_bonus_'+Date.now(), name:'Bandana commémoratif', slot:'top', rarity:'Commun', reduce:{all:0.01}}); addLog('🧩 Bonus quotidien : objet <b>Bandana commémoratif</b> (commun) ajouté à l\'inventaire'); }
+    account.coins = fmt(account.coins + reward, 2);
+    account.lastDailyRewardAt = Date.now();
+    updateHeaderBars(); saveState();
+  }
+
+  function getCharById(id){return baseCharacters.find(c=>c.id===id)}
+
+  function renderCharacters(){
+    const wrap = document.getElementById('charList'); wrap.innerHTML = '';
+    baseCharacters.forEach(c=>{
+      if(!state.chars[c.id]) state.chars[c.id] = newCharState(c);
+      const cs = state.chars[c.id];
+      const chip = document.createElement('button');
+      chip.className = 'chip'+(state.activeChar===c.id? ' active':'' );
+      chip.onclick = ()=>{ state.activeChar=c.id; syncAllPanels(); renderTrainings(); renderEquipSlots(); saveState(); };
+      chip.innerHTML = `
+        <div class="avatar">${c.img ? `<img src="${c.img}" alt="${c.name}" onerror="this.onerror=null; this.parentNode.textContent='${c.name[0]}';">` : c.name[0]}</div>
+        <div style="text-align:left">
+          <div style="font-weight:600">${c.name}</div>
+          <div class="small">Fatigue ${cs.fatigueNow}/${cs.fatigueMax} — Niv ${cs.level}</div>
+          <div class="small">E ${c.stats.endu.toFixed(1)} • F ${c.stats.force.toFixed(1)} • V ${c.stats.vit.toFixed(1)} • T ${c.stats.tech.toFixed(1)}</div>
+        </div>`;
+      wrap.appendChild(chip);
+    })
+  }
+
+  function updateHeaderBars(){
+    const cs = state.chars[state.activeChar];
+    document.getElementById('fatigueNow').textContent = cs.fatigueNow;
+    document.getElementById('fatigueMax').textContent = cs.fatigueMax;
+    document.getElementById('fatigueDot').style.background = cs.fatigueNow<=5? 'var(--danger)': 'var(--success)';
+    const left = getNextResetTimestamp() - Date.now();
+    const hh = String(Math.max(0, Math.floor(left/3600000))).padStart(2,'0');
+    const mm = String(Math.max(0, Math.floor((left%3600000)/60000))).padStart(2,'0');
+    const ss = String(Math.max(0, Math.floor((left%60000)/1000))).padStart(2,'0');
+    document.getElementById('resetTimer').textContent = `${hh}:${mm}:${ss}`;
+    document.getElementById('coins').textContent = account.coins.toFixed(2);
+    const dailyBtn = document.getElementById('dailyBtn'); dailyBtn.disabled = !canClaimDailyReward(); dailyBtn.textContent = canClaimDailyReward()? 'Récompense du jour' : 'Récompense prise';
+  }
+
+  function syncStatsPanel(){
+    const c = getCharById(state.activeChar); const cs = state.chars[state.activeChar];
+    document.getElementById('statEndu').textContent = c.stats.endu.toFixed(1);
+    document.getElementById('statForce').textContent = c.stats.force.toFixed(1);
+    document.getElementById('statVit').textContent = c.stats.vit.toFixed(1);
+    document.getElementById('statTech').textContent = c.stats.tech.toFixed(1);
+    document.getElementById('charLevel').textContent = cs.level;
+    document.getElementById('xpNow').textContent = cs.xp; document.getElementById('xpNext').textContent = cs.xpNext;
+    document.getElementById('xpBar').style.width = Math.min(100, pct(cs.xp, cs.xpNext))+'%';
+    document.getElementById('acctLevel').textContent = account.level;
+    document.getElementById('acctXp').textContent = account.xp;
+    document.getElementById('acctXpNext').textContent = account.xpNext;
+    document.getElementById('acctXpBar').style.width = Math.min(100, pct(account.xp, account.xpNext))+'%';
+  }
+
+  function switchTheme(t){ document.body.setAttribute('data-theme', t); state.theme = t; saveState(); }
+  function showPage(id){ document.querySelectorAll('.page').forEach(p=>p.style.display='none'); document.getElementById('page-'+id).style.display='block'; document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active', b.getAttribute('data-page')===id)); }
+  function showToast(msg){ const toast = document.getElementById('toast'); const box = document.getElementById('toastBox'); box.textContent = msg; toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'), 1100); }
+
+  function getEquippedItemsForActive(){ const cs = state.chars[state.activeChar]; const ids = Object.values(cs.equip).filter(Boolean); return inventory.filter(it=>ids.includes(it.id)); }
+  function equipReductionFor(sport){ let r=1; getEquippedItemsForActive().forEach(item=>{ const v=(item.reduce && (item.reduce[sport] ?? item.reduce['all']))||0; r*= (1 - v); }); return r; }
+  function fatigueCostFinal(base){ return Math.ceil(base * equipReductionFor(state.sport)); }
+  function renderEquipSlots(){ const cs = state.chars[state.activeChar]; ['shoes','top','bottom','watch'].forEach(slot=>{ const lbl=document.getElementById('slot_'+slot); const id=cs.equip[slot]; const item=inventory.find(x=>x.id===id); lbl.textContent = item? item.name : 'aucun'; document.querySelector(`[data-slot="${slot}"]`).classList.toggle('active', !!item); }) }
+
+  function renderTrainings(){
+    const list = catalogs[state.sport]; const wrap = document.getElementById('trainList'); wrap.innerHTML='';
+    document.getElementById('sportHint').textContent = {course:'Course / Trail', hyrox:'Hyrox', crossfit:'Crossfit', velo:'Vélo', rugby:'Rugby (solo)'}[state.sport];
+    const cs = state.chars[state.activeChar];
+    list.forEach(t=>{
+      const cost = fatigueCostFinal(t.cost); const can = cs.fatigueNow >= cost;
+      const el=document.createElement('div'); el.className='it';
+      el.innerHTML = `<div class="row space"><div style="font-weight:600">${t.name}</div><div class="row" style="gap:8px"><span class="pill"><b>Fatigue</b> <span class="mono">${cost}</span></span><span class="pill"><b>XP</b> <span class="mono">${t.xp}</span></span><button class="btn primary" ${can?'':'disabled'}>Lancer</button></div></div><div class="k small">${Object.entries(t.gains).map(([k,v])=>`<span class="tag">+${fmt(v)} ${k}</span>`).join(' ')}</div>`;
+      el.querySelector('button').onclick = ()=> runTraining(t); wrap.appendChild(el);
+    })
+  }
+
+  function addLog(text){ const el=document.createElement('div'); el.className='log'; el.innerHTML=text; document.getElementById('journal').prepend(el); }
+  function accountGainXp(amount){ account.xp += amount; while(account.xp >= account.xpNext){ account.xp -= account.xpNext; account.level += 1; account.xpNext = Math.round(100*Math.pow(account.level,1.25)); addLog(`🏆 <b>Niveau de compte +1</b> → ${account.level}`);} }
+  function addItemToInventory(item){ inventory.push(item); renderInventory(); saveState(); }
+
+  function runTraining(t){
+    const cs = state.chars[state.activeChar]; tickPerCharRegen(state.activeChar);
+    const cost = fatigueCostFinal(t.cost); if(cs.fatigueNow < cost){return}
+    cs.fatigueNow -= cost;
+    cs.xp += t.xp; while(cs.xp >= cs.xpNext){ cs.xp -= cs.xpNext; cs.level += 1; cs.xpNext = calcXpNext(cs.level); cs.fatigueMax = calcFatigueMax(cs.level); addLog(`⬆️ <b>${getCharById(state.activeChar).name}</b> passe niveau ${cs.level} — fatigue max ${cs.fatigueMax}.`); }
+    const acctXp = Math.round(t.xp*0.25); accountGainXp(acctXp);
+    const euroGain = t.cost>=8? 0.20 : (t.cost>=6? 0.10 : 0.05); account.coins = fmt(account.coins + euroGain, 2);
+    const base = getCharById(state.activeChar); for(const [k,v] of Object.entries(t.gains)){ base.stats[k] = fmt(base.stats[k] + v); }
+    addLog(`🧭 ${t.name} — coût <b>${cost}</b> fatigue, +<b>${t.xp}</b> XP perso, +<b>${acctXp}</b> XP compte, +<b>${euroGain.toFixed(2)} €</b>.`);
+    syncAllPanels(); renderTrainings(); renderCharacters(); saveState();
+  }
+
+  let pendingAssignItemId = null;
+  function renderInventory(){
+    const grid = document.getElementById('invGrid'); grid.innerHTML = '';
+    inventory.forEach(it=>{
+      const d=document.createElement('div'); d.className='it'; d.style.border='1px dashed var(--line)'; d.style.padding='12px'; d.style.borderRadius='12px'; d.style.background='var(--chip)';
+      const assignedTo = findEquippedBy(it.id);
+      d.innerHTML = `<div class="row space"><b>${it.name}</b><span class="tag">${it.rarity}</span></div>
+        <div class="small">Slot: ${it.slot}</div>
+        <div class="small">Réduction: ${(Object.values(it.reduce||{}).map(v=>Math.round(v*100)+'%').join(' / ')||'—')}</div>
+        <div class="small">${assignedTo? 'Équipé par : <b>'+assignedTo.name+'</b>' : 'Disponible'}</div>
+        <div class="row" style="margin-top:8px;gap:8px"><button class="btn" ${assignedTo?'disabled':''}>Assigner</button></div>`;
+      d.querySelector('button').onclick = ()=> openAssignModal(it.id); grid.appendChild(d);
+    })
+  }
+  function findEquippedBy(itemId){ for(const c of baseCharacters){ const cs = state.chars[c.id]; if(!cs) continue; for(const [slot,id] of Object.entries(cs.equip)){ if(id===itemId) return c; } } return null; }
+  function openAssignModal(itemId){ pendingAssignItemId = itemId; const item = inventory.find(x=>x.id===itemId); document.getElementById('assignItemInfo').innerHTML = `<b>${item.name}</b> — slot <b>${item.slot}</b>`; const sel=document.getElementById('assignCharSel'); sel.innerHTML=''; baseCharacters.forEach(c=>{ const opt=document.createElement('option'); opt.value=c.id; opt.textContent=c.name; sel.appendChild(opt); }); document.getElementById('assignModal').classList.add('show'); }
+  function closeAssignModal(){ document.getElementById('assignModal').classList.remove('show'); pendingAssignItemId = null; }
+  function doAssign(){ if(!pendingAssignItemId) return; const charId=document.getElementById('assignCharSel').value; const cs=state.chars[charId]; const item=inventory.find(x=>x.id===pendingAssignItemId); if(!cs||!item) return; cs.equip[item.slot]=item.id; addLog(`🎒 <b>${item.name}</b> attribué à <b>${getCharById(charId).name}</b> (slot ${item.slot}).`); closeAssignModal(); renderInventory(); renderEquipSlots(); renderTrainings(); saveState(); }
+
+  function syncAllPanels(){ updateHeaderBars(); syncStatsPanel(); renderEquipSlots(); }
+  function bindNav(){ document.querySelectorAll('.tab').forEach(b=>{ b.addEventListener('click',()=>showPage(b.getAttribute('data-page'))) }) }
+  function bindTheme(){ const sel=document.getElementById('themeSel'); sel.value=state.theme; sel.addEventListener('change',()=>switchTheme(sel.value)); }
+  function bindControls(){ document.getElementById('switchSport').onclick = ()=>{ state.sport = document.getElementById('sportSel').value; renderTrainings(); saveState(); const name={course:'Course / Trail', hyrox:'Hyrox', crossfit:'Crossfit', velo:'Vélo', rugby:'Rugby (solo)'}[state.sport]; showToast(`${name} appliqué`); }; document.getElementById('dailyBtn').onclick=()=>{ claimDailyReward(); }; document.getElementById('assignCancel').onclick=closeAssignModal; document.getElementById('assignConfirm').onclick=doAssign; }
+
+  function init(){
+    baseCharacters.forEach(c=>{ state.chars[c.id] = state.chars[c.id] || newCharState(c) });
+    loadState();
+    renderCharacters(); renderTrainings(); renderInventory();
+    bindNav(); bindTheme(); bindControls();
+    syncAllPanels(); showPage('dashboard'); switchTheme(state.theme||'A');
+    let autosaveCtr=0; setInterval(()=>{ tickPerCharRegen(state.activeChar); updateHeaderBars(); renderCharacters(); autosaveCtr++; if(autosaveCtr%5===0) saveState(); },1000);
+  }
+  init();
+  </script>
+
+  <script>
+    (function(){
+      const tag = localStorage.getItem('stratj_currentUserTag');
+      if (tag) {
+        const el = document.getElementById('userTag');
+        if (el) el.textContent = tag;
+      }
+      const btn = document.getElementById('logoutBtn');
+      if (btn) {
+        btn.addEventListener('click', function(){
+          try {
+            if (window.firebase && firebase.apps.length && window.STRATJ_FIREBASE_CONFIG) {
+              const app = firebase.apps[0] || firebase.initializeApp(window.STRATJ_FIREBASE_CONFIG || {});
+              firebase.auth().signOut().catch(()=>{});
+            }
+          } catch(e){}
+          localStorage.removeItem('stratj_currentUserTag');
+          window.location.href = 'index.html';
+        });
+      }
+    })();
+  </script>
+</body>
+
+</html>
