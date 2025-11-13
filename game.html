@@ -237,8 +237,13 @@
       <div class="small">(Un objet équipé devient indisponible pour les autres persos jusqu’au retrait.)</div>
     </div>
   </div>
+  
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="./firebase-config.js"></script>
 
-  <script>
+   <script>
   const STORAGE_KEY = 'stratj_v1';
   function saveState(){ const toSave = {account, state, baseCharacters, inventory}; localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave)); }
   function loadState(){ try{ const raw = localStorage.getItem(STORAGE_KEY); if(!raw) return false; const data = JSON.parse(raw);
